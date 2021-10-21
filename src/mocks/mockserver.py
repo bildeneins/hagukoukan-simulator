@@ -13,7 +13,8 @@ def main():
 def get():
     data = [
         { "id": "0", "cycle_time": "10000", "machine_name": "KSPS-0759","drill_counter_stop": "30.0"},
-        { "id": "1", "cycle_time": "5000", "machine_name": "KSPS-0759","drill_counter_stop": "60.0"}
+        { "id": "1", "cycle_time": "5000", "machine_name": "KSPS-0759","drill_counter_stop": "60.0"},
+        { "id": "2", "cycle_time": "15000", "machine_name": "KSPS-0759","drill_counter_stop": "80.0"}
     ]
     res = HTTPResponse(status=200, body=json.dumps(data))
     res.set_header('Content-Type', 'application/json')

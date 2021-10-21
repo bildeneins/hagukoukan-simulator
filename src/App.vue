@@ -1,39 +1,78 @@
 <template>
   <v-app>
-    <div>
-      <v-btn
-          @click="clickedStartBtn"
+    <tab
+      @toIppan="showIppan"
+      @toKiban="showKiban"
+    />
+    <div v-show="isIppan">
+      <DrillBtn
+        @clickedStartBtn="clickedStartBtn"
       >
-        開始
-      </v-btn>
+      </DrillBtn>
     </div>
-    <v-main>
-    </v-main>
+    <div v-show="isKiban">
+      <v-container>
+        <v-row>
+          <v-col v-for="(idLineNumber,index) in idLineNumbers" :key="index">
+            <DrillCard
+              :machine-name="tasks[idLineNumber].machine_name"
+              :is-machine-stopping=false
+              @clickedStopBtn="clickedDrillCardStopBtn(index)"
+            />
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
   </v-app>
 </template>
 
 <script>
-import simulator from "@/scripts/simulator"
+import simulator from "./scripts/simulator";
+import Tab from "./components/Tab.vue";
+import DrillCard from "./components/DrillCard";
+import DrillBtn from "./components/DrillBtn";
 
 export default {
   name: 'App',
   components: {
+    Tab, DrillCard,DrillBtn
   },
   data: () => ({
-    task: [],
-    usingTaskIds: [0, 1]
+    tasks: [],
+    usingTaskIds: [1, 2],
+    idLineNumbers: [],
+    isMachineStoppingLists:[],
+    isKiban: false,
+    isIppan: true
   }),
   methods:{
     async clickedStartBtn(){
-      this.task = await simulator.getTable()
-      console.log(this.task)
+      this.tasks = await simulator.getTable()
+      console.log(this.tasks)
+      this.idLineNumbers = []
+      for(let i = 0; i < this.usingTaskIds.length; i++){
+        let num = this.tasks.findIndex(task =>
+          this.usingTaskIds[i] === Number(task.id)
+        )
+        this.idLineNumbers.push(num)
+      }
       for(let i = 0; i < this.usingTaskIds.length; i++){
         const id = this.usingTaskIds[i]
-        console.log(id)
-        simulator.intervalPost( id, this.task)
+        console.log("id: ", id,"line num: ", this.idLineNumbers[i])
+        simulator.intervalPost( this.idLineNumbers[i], this.tasks)
       }
+    },
+    showIppan(){
+      this.isIppan = true
+      this.isKiban = false
+    },
+    showKiban(){
+      this.isIppan = false
+      this.isKiban = true
+    },
+    clickedDrillCardStopBtn(index){
+      console.log(index)
     }
   }
-
 };
 </script>
