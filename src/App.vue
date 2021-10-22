@@ -1,23 +1,28 @@
 <template>
   <v-app>
     <tab
-      @toIppan="showIppan"
-      @toKiban="showKiban"
+      @toIppan="changeView('general')"
+      @toKiban="changeView('machines')"
     />
-    <div v-show="isIppan">
+    <div v-if="isIppan">
       <DrillBtn
-        @clickedStartBtn="clickedStartBtn"
+          :running="running"
+        @click-start="clickedStartBtn"
+        @click-stop="clickedStopButton"
       >
       </DrillBtn>
     </div>
-    <div v-show="isKiban">
+    <div v-else-if="isKiban">
       <v-container>
         <v-row>
-          <v-col v-for="(idLineNumber,index) in idLineNumbers" :key="index">
+          <v-col
+              v-for="(machine,index) in machines"
+              :key="index"
+          >
             <DrillCard
-              :machine-name="tasks[idLineNumber].machine_name"
-              :is-machine-stopping=false
-              @clickedStopBtn="clickedDrillCardStopBtn(index)"
+              :machine-name="machine.name"
+              :is-machine-stopping="machine.stopping"
+              @clickedStopBtn="clickedDrillCardStopBtn(machine.id)"
             />
           </v-col>
         </v-row>
@@ -31,6 +36,7 @@ import simulator from "./scripts/simulator";
 import Tab from "./components/Tab.vue";
 import DrillCard from "./components/DrillCard";
 import DrillBtn from "./components/DrillBtn";
+import api from './api'
 
 export default {
   name: 'App',
@@ -38,15 +44,48 @@ export default {
     Tab, DrillCard,DrillBtn
   },
   data: () => ({
+    running: false,
     tasks: [],
-    usingTaskIds: [1, 2],
+    usingTaskIds: [6, 7, 8, 9, 10, 11, 12, 13, 14],
     idLineNumbers: [],
+    machines: [
+      { id: 0, name: '1号機', stopping: false},
+      { id: 1, name: '2号機', stopping: false},
+      { id: 2, name: '3号機', stopping: false},
+    ],
+    intervalIds: [],
     isMachineStoppingLists:[],
-    isKiban: false,
-    isIppan: true
+    view: 'general', // 'general' | 'machines',
+    intervalId: null
   }),
+  computed: {
+    isIppan() {
+      return this.view === 'general'
+    },
+    isKiban() {
+      return this.view === 'machines'
+    },
+  },
+  mounted() {
+    this.intervalId = setInterval(async () => {
+      const stopping1 = await api.getIsMachineStopping('1号機')
+      const stopping2 = await api.getIsMachineStopping('2号機')
+      const stopping3 = await api.getIsMachineStopping('3号機')
+      this.machines = [
+        { id: 0, name: '1号機', stopping: stopping1},
+        { id: 1, name: '2号機', stopping: stopping2},
+        { id: 2, name: '3号機', stopping: stopping3},
+      ]
+    }, 5000)
+  },
+  destroyed() {
+    if (this.intervalId != null) {
+      clearInterval(this.intervalId)
+    }
+  },
   methods:{
-    async clickedStartBtn(){
+    async clickedStartBtn() {
+      this.running = true
       this.tasks = await simulator.getTable()
       console.log(this.tasks)
       this.idLineNumbers = []
@@ -59,19 +98,20 @@ export default {
       for(let i = 0; i < this.usingTaskIds.length; i++){
         const id = this.usingTaskIds[i]
         console.log("id: ", id,"line num: ", this.idLineNumbers[i])
-        simulator.intervalPost( this.idLineNumbers[i], this.tasks)
+        const intervalId = await simulator.intervalPost( this.idLineNumbers[i], this.tasks)
+        this.intervalIds.push(intervalId)
       }
     },
-    showIppan(){
-      this.isIppan = true
-      this.isKiban = false
+    clickedStopButton() {
+      this.running = false
+      this.intervalIds.forEach(i => simulator.stopintervalPost(i))
     },
-    showKiban(){
-      this.isIppan = false
-      this.isKiban = true
+    clickedDrillCardStopBtn(machineId) {
+      const machine = this.machines.find(i => i.id === machineId)
+      console.log('stop: ', machine)
     },
-    clickedDrillCardStopBtn(index){
-      console.log(index)
+    changeView(newView) { // newView: 'general' | 'machines'
+      this.view = newView
     }
   }
 };

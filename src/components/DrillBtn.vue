@@ -1,13 +1,13 @@
 <template>
   <v-container>
-    <v-row v-if="btnNum === 0">
+    <v-row v-if="!running">
       <v-col>
         <v-btn @click="clickStart">
           {{'開始'}}
         </v-btn>
       </v-col>
     </v-row>
-    <v-row v-if="btnNum === 1">
+    <v-row v-if="running">
       <v-col>
         <v-btn @click="clickStop">
           {{'停止'}}
@@ -32,6 +32,12 @@
 <script>
 export default {
   name: "DrillBtn",
+  props: {
+    running: {
+      type: Boolean,
+      required: true
+    }
+  },
   data(){
     return {
       btnNum: 0
@@ -39,11 +45,10 @@ export default {
   },
   methods: {
     clickStart(){
-      this.btnNum = 1
-      this.$emit("clickedStartBtn")
+      this.$emit("click-start")
     },
     clickStop(){
-      this.btnNum = 2
+      this.$emit('click-stop')
     }
   }
 }
