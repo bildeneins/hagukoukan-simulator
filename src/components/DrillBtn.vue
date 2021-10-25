@@ -1,28 +1,23 @@
 <template>
   <v-container>
-    <v-row v-if="btnNum === 0">
+    <v-row v-if="isStartBtnView">
       <v-col>
         <v-btn @click="clickStart">
           {{'開始'}}
         </v-btn>
       </v-col>
-    </v-row>
-    <v-row v-if="btnNum === 1">
       <v-col>
-        <v-btn @click="clickStop">
-          {{'停止'}}
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row v-if="btnNum === 2">
-      <v-col>
-        <v-btn>
-          {{'再開'}}
-        </v-btn>
-      </v-col>
-      <v-col>
-        <v-btn>
+        <v-btn  @click="clickReset">
           {{'リセット'}}
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row v-if="!(isStartBtnView)">
+      <v-col>
+        <v-btn
+          @click="clickStop"
+        >
+          {{'停止'}}
         </v-btn>
       </v-col>
     </v-row>
@@ -34,17 +29,22 @@ export default {
   name: "DrillBtn",
   data(){
     return {
-      btnNum: 0
+      isStartBtnView: true
     }
   },
   methods: {
     clickStart(){
-      this.btnNum = 1
+      this.isStartBtnView  = false
       this.$emit("clickedStartBtn")
     },
+    clickReset(){
+      this.$emit("clickedResetBtn")
+    },
     clickStop(){
-      this.btnNum = 2
-    }
+      this.isStartBtnView = true
+      this.$emit("clickedStopBtn")
+    },
+
   }
 }
 </script>

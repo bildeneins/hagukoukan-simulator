@@ -21,7 +21,7 @@ def get():
     res.set_header('Access-Control-Allow-Origin', '*')
     return res
 
-drill_counter_list = [5,8]
+drill_counter_list = [5,8,10,29,15]
 @route('/tasks/count', method='GET')
 def get():
     id = int(request.query.get('id'))
@@ -41,11 +41,20 @@ def post():
     res.set_header('Access-Control-Allow-Origin', '*')
     return res
 
+isMachineStopingList = [
+{"stopping":True,"emergency":True},
+{"stopping":True,"emergency":False},
+{"stopping":False,"emergency":True},
+{"stopping":False,"emergency":False}]
 @route('/tasks/isMachineStopping', method='GET')
 def get():
     machine_name = request.query.get('machine_name')
-    isMachineStopping = False
-    res = HTTPResponse(status=200, body=json.dumps(isMachineStopping))
+    if(drill_counter_list[1] > 10):
+        data = isMachineStopingList[0]
+    else:
+        data = isMachineStopingList[1]
+    
+    res = HTTPResponse(status=200, body=json.dumps(data))
     res.set_header('Content-Type', 'application/json')
     res.set_header('Access-Control-Allow-Origin', '*')
     return res
