@@ -64,7 +64,7 @@ export default {
     },
     isKiban() {
       return this.view === 'machines'
-    },
+    }
   },
   mounted() {
     this.intervalId = setInterval(async () => {
@@ -86,25 +86,23 @@ export default {
   methods:{
     async clickedStartBtn() {
       this.running = true
-      this.tasks = await simulator.getTable()
-      console.log(this.tasks)
-      this.idLineNumbers = []
-      for(let i = 0; i < this.usingTaskIds.length; i++){
-        let num = this.tasks.findIndex(task =>
-          this.usingTaskIds[i] === Number(task.id)
-        )
-        this.idLineNumbers.push(num)
-      }
-      for(let i = 0; i < this.usingTaskIds.length; i++){
-        const id = this.usingTaskIds[i]
-        console.log("id: ", id,"line num: ", this.idLineNumbers[i])
-        const intervalId = await simulator.intervalPost( this.idLineNumbers[i], this.tasks)
-        this.intervalIds.push(intervalId)
-      }
+      const tasks = await simulator.getTable()
+      const usingTasks = this.usingTaskIds.map(taskId => {
+        const task = tasks.find(t => t.id === taskId)
+        if (task) {
+          return task
+        }
+      })
+      usingTasks.forEach(task => {
+        simulator.intervalPost(task)
+          .then(intervalId => {
+            this.intervalIds.push(intervalId)
+          })
+      })
     },
     clickedStopButton() {
       this.running = false
-      this.intervalIds.forEach(i => simulator.stopintervalPost(i))
+      this.intervalIds.forEach(i => simulator.stopIntervalPost(i))
     },
     clickedDrillCardStopBtn(machineId) {
       const machine = this.machines.find(i => i.id === machineId)

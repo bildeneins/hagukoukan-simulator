@@ -1,75 +1,70 @@
 import api from '../api'
 
-function intervalPost( id_line_number, all_data_list) {
+/**
+ * 一定間隔でサーバにカウント増加リクエストを送信します。
+ * @module object
+ * @param {Object} task - ユーザーオブジェクト
+ * @param {number} task.id - タスクのid
+ * @param {number} task.cycle_time - 刃具カウントの増加間隔
+ * @param {string} task.machine_name - 機番
+ * @param {number} task.drill_counter_stop - 刃具カウントの停止値
+ * @return {Promise<number>} intervalId - 定期送信用 setInterval()の返り値
+ */
+function intervalPost(task) {
     return new Promise((resolve) => {
-        const id = Number(all_data_list[id_line_number].id)
-        const interval_sec = Number(all_data_list[id_line_number].cycle_time)
-        console.log('interval_time', interval_sec)
-        const machine_name = String(all_data_list[id_line_number].machine_name)
-        const drill_counter_stop = Number(all_data_list[id_line_number].drill_counter_stop)
-        const intervalId = setInterval(async ()=>{
+        const id = Number(task.id)
+        const interval_sec = Number(task.cycle_time)
+        const machine_name = String(task.machine_name)
+        const drill_counter_stop = Number(task.drill_counter_stop)
+        const intervalId = setInterval(async () => {
             // get drill counter の値をget
-            let drill_counter_count = 0
+            let current_count = 0
             let isMachineStopping = false
             try {
                 // drill
-                const response = await api.getCount(id)
-                drill_counter_count = Number(response.data)
-            } catch (error) {
-                const { status, statusText} = error.response;
-                console.log(`Error! HTTP Status: ${status} ${statusText}`);
-            }
-            try {
+                const count = (await api.getCount(id)).data
+                current_count = Number(count)
                 // machine stop
-                const response = await api.getIsMachineStopping(machine_name)
-                isMachineStopping = Boolean(response.data)
-            } catch (error) {
-                const { status, statusText} = error.response;
+                const stopping = (await api.getIsMachineStopping(machine_name)).data
+                isMachineStopping = Boolean(stopping)
+            } catch (e) {
+                const { status, statusText} = e.response;
                 console.log(`Error! HTTP Status: ${status} ${statusText}`);
             }
-
-            console.log("id: ", id, "now drill count", drill_counter_count," Machine Stop:", isMachineStopping)
-
             // get drill counter,isMachineStopping が条件を満たすなら、cycle_time_dataをpost
-            if(drill_counter_count <= drill_counter_stop && isMachineStopping === false){
-                // const cycle_time_data = 1
-                api.incrementCount(id)
-                  .then(response =>  {
-                      console.log( response.data, ":", id)
-                  }).catch(error => {
-                    console.log(error);
-                });
+            if(current_count < drill_counter_stop && isMachineStopping === false){
+                try {
+                    await api.incrementCount(id)
+                } catch(e) {
+                    console.error(e);
+                }
             }
         }, interval_sec * 1000)
         resolve(intervalId)
     })
 }
 
+/**
+ * タスク一覧をサーバから取得します。
+ */
 async function getTable() {
-    // all_data_list をget
-    let all_data_list = []
     try {
-        const response = await api.getTasks()
-        // console.log(response.data)
-        all_data_list = response.data
+        return (await api.getTasks()).data
     } catch (e) {
         console.error(e)
-        // const { status, statusText} = error.response;
-        // console.log(`Error! HTTP Status: ${status} ${statusText}`);
     }
-    return all_data_list
-    // for(let i = 0; i < all_data_list.length; i++){
-    //     console.log("for ",i)
-    //     intervalPost(i)
-    // }
 }
 
-function stopintervalPost(intervalId) {
+/**
+ * 定期的なカウント増加リクエストの送信を停止します。
+ * @param {number} intervalId - setInterval()の返り値
+ */
+function stopIntervalPost(intervalId) {
     clearInterval(intervalId)
 }
 
 export default {
     getTable,
     intervalPost,
-    stopintervalPost
+    stopIntervalPost
 };
