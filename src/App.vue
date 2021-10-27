@@ -130,6 +130,7 @@ export default {
       })
       const taskCounts = await countsGenerator.getCounts(usingTasks)
       await api.setCounts(taskCounts)
+      this.showResetModal = false
     },
     clickedDrillCardStopBtn(machineId) {
       const machine = this.machines.find(i => i.id === machineId)
