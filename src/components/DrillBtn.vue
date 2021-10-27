@@ -2,27 +2,20 @@
   <v-container>
     <v-row v-if="!running">
       <v-col>
-        <v-btn @click="clickStart">
-          {{'開始'}}
+        <v-btn @click="onClickStart">
+          開始
+        </v-btn>
+      </v-col>
+      <v-col>
+        <v-btn @click="onClickReset">
+          リセット
         </v-btn>
       </v-col>
     </v-row>
     <v-row v-if="running">
       <v-col>
-        <v-btn @click="clickStop">
-          {{'停止'}}
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row v-if="btnNum === 2">
-      <v-col>
-        <v-btn>
-          {{'再開'}}
-        </v-btn>
-      </v-col>
-      <v-col>
-        <v-btn>
-          {{'リセット'}}
+        <v-btn @click="onClickStop">
+          停止
         </v-btn>
       </v-col>
     </v-row>
@@ -35,7 +28,7 @@ export default {
   props: {
     running: {
       type: Boolean,
-      required: true
+      require: true
     }
   },
   data(){
@@ -44,11 +37,14 @@ export default {
     }
   },
   methods: {
-    clickStart(){
+    onClickStart() {
       this.$emit("click-start")
     },
-    clickStop(){
+    onClickStop() {
       this.$emit('click-stop')
+    },
+    onClickReset() {
+      this.$emit('click-reset')
     }
   }
 }

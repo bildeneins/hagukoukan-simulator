@@ -7,16 +7,24 @@
       <v-container>
         <v-row>
           <v-col v-if="isMachineStopping === false">
-            {{"稼働中"}}
+            稼働中
           </v-col>
-          <v-col v-if="isMachineStopping === true">
-            {{"停止中"}}
+          <v-col v-show="isMachineStopping === true && isMachineEmergency === false">
+            {{"停止中 - 作業中"}}
+          </v-col>
+          <v-col v-show="isMachineStopping === true && isMachineEmergency === true">
+            {{"停止中 - 設備異常"}}
           </v-col>
         </v-row>
         <v-row>
           <v-col>
-            <v-btn :disabled="isMachineStopping === true" @click="onClickStopBtn">
-              {{"停止"}}
+            <v-btn
+                :disabled="isMachineStopping === true"
+                @click="onClickStopBtn"
+                color="danger"
+                class="danger--text"
+            >
+              停止させる
             </v-btn>
           </v-col>
         </v-row>
@@ -28,9 +36,10 @@
 <script>
 export default {
   name: "DrillCard" ,
-  props:{
-    machineName: {default: '0', type: String, require: true},
-    isMachineStopping: {default: false, type: Boolean, require: true}
+  props: {
+    machineName: {type: String, require: true},
+    isMachineStopping: {type: Boolean, require: true},
+    isMachineEmergency: {type: Boolean, require: true}
   },
   methods:{
     onClickStopBtn() {

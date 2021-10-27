@@ -22,10 +22,10 @@ function intervalPost(task) {
             let isMachineStopping = false
             try {
                 // drill
-                const count = (await api.getCount(id)).data
+                const count = await api.getCount(id)
                 current_count = Number(count)
                 // machine stop
-                const stopping = (await api.getIsMachineStopping(machine_name)).data
+                const stopping = (await api.getIsMachineStopping(machine_name)).stopping
                 isMachineStopping = Boolean(stopping)
             } catch (e) {
                 const { status, statusText} = e.response;

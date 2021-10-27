@@ -7,8 +7,9 @@
     <div v-if="isIppan">
       <DrillBtn
           :running="running"
-        @click-start="clickedStartBtn"
-        @click-stop="clickedStopButton"
+          @click-start="clickedStartBtn"
+          @click-stop="clickedStopButton"
+          @click-reset="clickedResetButton"
       >
       </DrillBtn>
     </div>
@@ -22,12 +23,18 @@
             <DrillCard
               :machine-name="machine.name"
               :is-machine-stopping="machine.stopping"
+              :is-machine-emergency="machine.emergency"
               @clickedStopBtn="clickedDrillCardStopBtn(machine.id)"
             />
           </v-col>
         </v-row>
       </v-container>
     </div>
+    <ResetModal
+        :show="showResetModal"
+        @ok="resetCounts"
+        @cancel="showResetModal = false"
+    />
   </v-app>
 </template>
 
@@ -36,12 +43,13 @@ import simulator from "./scripts/simulator";
 import Tab from "./components/Tab.vue";
 import DrillCard from "./components/DrillCard";
 import DrillBtn from "./components/DrillBtn";
+import ResetModal from "./components/ResetModal";
 import api from './api'
 
 export default {
   name: 'App',
   components: {
-    Tab, DrillCard,DrillBtn
+    Tab, DrillCard,DrillBtn, ResetModal
   },
   data: () => ({
     running: false,
@@ -49,14 +57,15 @@ export default {
     usingTaskIds: [6, 7, 8, 9, 10, 11, 12, 13, 14],
     idLineNumbers: [],
     machines: [
-      { id: 0, name: '1号機', stopping: false},
-      { id: 1, name: '2号機', stopping: false},
-      { id: 2, name: '3号機', stopping: false},
+      { id: 0, name: '1号機', stopping: false, emergency: false},
+      { id: 1, name: '2号機', stopping: false, emergency: false},
+      { id: 2, name: '3号機', stopping: false, emergency: false},
     ],
     intervalIds: [],
     isMachineStoppingLists:[],
     view: 'general', // 'general' | 'machines',
-    intervalId: null
+    intervalId: null,
+    showResetModal: false
   }),
   computed: {
     isIppan() {
@@ -68,13 +77,16 @@ export default {
   },
   mounted() {
     this.intervalId = setInterval(async () => {
-      const stopping1 = await api.getIsMachineStopping('1号機')
-      const stopping2 = await api.getIsMachineStopping('2号機')
-      const stopping3 = await api.getIsMachineStopping('3号機')
+      const stopping1 = await api.getIsMachineStopping('1号機').stopping
+      const stopping2 = await api.getIsMachineStopping('2号機').stopping
+      const stopping3 = await api.getIsMachineStopping('3号機').stopping
+      const emergency1 = await api.getIsMachineStopping('1号機').emergency
+      const emergency2 = await api.getIsMachineStopping('2号機').emergency
+      const emergency3 = await api.getIsMachineStopping('3号機').emergency
       this.machines = [
-        { id: 0, name: '1号機', stopping: stopping1},
-        { id: 1, name: '2号機', stopping: stopping2},
-        { id: 2, name: '3号機', stopping: stopping3},
+        { id: 0, name: '1号機', stopping: stopping1, emergency: emergency1},
+        { id: 1, name: '2号機', stopping: stopping2, emergency: emergency2},
+        { id: 2, name: '3号機', stopping: stopping3, emergency: emergency3},
       ]
     }, 5000)
   },
@@ -103,6 +115,13 @@ export default {
     clickedStopButton() {
       this.running = false
       this.intervalIds.forEach(i => simulator.stopIntervalPost(i))
+    },
+    clickedResetButton() {
+      this.showResetModal = true
+    },
+    resetCounts() {
+      // TODO
+      console.error('this method should be implemented')
     },
     clickedDrillCardStopBtn(machineId) {
       const machine = this.machines.find(i => i.id === machineId)
