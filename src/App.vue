@@ -134,6 +134,7 @@ export default {
     clickedDrillCardStopBtn(machineId) {
       const machine = this.machines.find(i => i.id === machineId)
       console.log('stop: ', machine)
+      api.toggleMachineStopping(machine.name, true)
     },
     changeView(newView) { // newView: 'general' | 'machines'
       this.view = newView
