@@ -1,12 +1,15 @@
-function getCountForNormalTask() {
-  return 0
-}
+const counts = require('sim-counts')
+// function getCountForNormalTask() {
+//   return 0
+// }
 function getCountForTask(task) {
-  if (task.task_type === '定量作業') {
-    return getCountForNormalTask()
-  } else {
-    return 0
+  if (task.id !== null) {
+    const res = counts.find(i => i.id === task.id)
+    if (res) {
+      return res.count
+    }
   }
+  return 0
 }
 export default {
   /**
