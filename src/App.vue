@@ -78,12 +78,12 @@ export default {
   },
   mounted() {
     this.intervalId = setInterval(async () => {
-      const stopping1 = await api.getIsMachineStopping('1号機').stopping
-      const stopping2 = await api.getIsMachineStopping('2号機').stopping
-      const stopping3 = await api.getIsMachineStopping('3号機').stopping
-      const emergency1 = await api.getIsMachineStopping('1号機').emergency
-      const emergency2 = await api.getIsMachineStopping('2号機').emergency
-      const emergency3 = await api.getIsMachineStopping('3号機').emergency
+      const stopping1 = (await api.getIsMachineStopping('1号機')).stopping
+      const stopping2 = (await api.getIsMachineStopping('2号機')).stopping
+      const stopping3 = (await api.getIsMachineStopping('3号機')).stopping
+      const emergency1 = (await api.getIsMachineStopping('1号機')).emergency
+      const emergency2 = (await api.getIsMachineStopping('2号機')).emergency
+      const emergency3 = (await api.getIsMachineStopping('3号機')).emergency
       this.machines = [
         { id: 0, name: '1号機', stopping: stopping1, emergency: emergency1},
         { id: 1, name: '2号機', stopping: stopping2, emergency: emergency2},

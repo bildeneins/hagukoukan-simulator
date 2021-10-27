@@ -9,10 +9,10 @@
           <v-col v-if="isMachineStopping === false">
             稼働中
           </v-col>
-          <v-col v-show="isMachineStopping === true && isMachineEmergency === false">
+          <v-col v-else-if="isMachineStopping === true && isMachineEmergency === false">
             {{"停止中 - 作業中"}}
           </v-col>
-          <v-col v-show="isMachineStopping === true && isMachineEmergency === true">
+          <v-col v-else-if="isMachineStopping === true && isMachineEmergency === true">
             {{"停止中 - 設備異常"}}
           </v-col>
         </v-row>
