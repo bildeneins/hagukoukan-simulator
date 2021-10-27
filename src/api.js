@@ -27,9 +27,17 @@ export default {
   /**
    * タスクの設備カウントを1増加させる
    * @param taskId
-   * @returns {Promise<AxiosResponse<unknown>>}
+   * @returns {Promise<any>}
    */
   async incrementCount(taskId) {
-    return await client.get(`tasks/count/increment?id=${taskId}`)
+    return (await client.get(`tasks/count/increment?id=${taskId}`)).data
   },
+  /**
+   * 全てのタスクのカウントを与えられた値にリセットする
+   * @param taskCounts
+   * @return Promise<{success: Boolean}>
+   */
+  async setCounts(taskCounts) {
+    return (await client.post('tasks/count/multi', taskCounts)).data
+  }
 }

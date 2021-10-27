@@ -45,6 +45,7 @@ import DrillCard from "./components/DrillCard";
 import DrillBtn from "./components/DrillBtn";
 import ResetModal from "./components/ResetModal";
 import api from './api'
+import countsGenerator from "./scripts/countsGenerator";
 
 export default {
   name: 'App',
@@ -119,9 +120,16 @@ export default {
     clickedResetButton() {
       this.showResetModal = true
     },
-    resetCounts() {
-      // TODO
-      console.error('this method should be implemented')
+    async resetCounts() {
+      const tasks = await simulator.getTable()
+      const usingTasks = this.usingTaskIds.map(taskId => {
+        const task = tasks.find(t => t.id === taskId)
+        if (task) {
+          return task
+        }
+      })
+      const taskCounts = await countsGenerator.getCounts(usingTasks)
+      await api.setCounts(taskCounts)
     },
     clickedDrillCardStopBtn(machineId) {
       const machine = this.machines.find(i => i.id === machineId)
