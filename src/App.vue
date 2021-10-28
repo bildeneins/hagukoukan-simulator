@@ -105,6 +105,8 @@ export default {
     async clickedStartBtn() {
       this.running = true
       const tasks = await simulator.getTable()
+      this.usingTaskIds = tasks.filter(i => (i.task_type && i.task_type === '定量作業')).map(i => i.id)
+      console.log('using ids:', this.usingTaskIds)
       const usingTasks = this.usingTaskIds.map(taskId => {
         const task = tasks.find(t => t.id === taskId)
         if (task) {
