@@ -40,10 +40,14 @@ export default {
   async setCounts(taskCounts) {
     return (await client.post('tasks/count/multi', taskCounts)).data
   },
+  async applySettings(settings) {
+    await client.post('/settings/terms', settings.terms)
+    await client.post('/settings/restTimes', settings.restTimes)
+  },
   async toggleMachineStopping(machineName, stopping) {
     return (await client.post('/tasks/downtimes/isMachineStopping', {
       machine_name: machineName,
       stopping: stopping
     })).data
-  }
+  },
 }

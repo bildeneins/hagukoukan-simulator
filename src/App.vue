@@ -31,7 +31,9 @@
       </v-container>
     </div>
     <ResetModal
+        v-if="showResetModal"
         :show="showResetModal"
+        :settings="settings"
         @ok="resetCounts"
         @cancel="showResetModal = false"
     />
@@ -40,6 +42,7 @@
 
 <script>
 import simulator from "./scripts/simulator";
+import termsGen from './scripts/termsGenerator'
 import Tab from "./components/Tab.vue";
 import DrillCard from "./components/DrillCard";
 import DrillBtn from "./components/DrillBtn";
@@ -67,7 +70,8 @@ export default {
     isMachineStoppingLists:[],
     view: 'general', // 'general' | 'machines',
     intervalId: null,
-    showResetModal: false
+    showResetModal: false,
+    settings: null
   }),
   computed: {
     isIppan() {
@@ -119,9 +123,12 @@ export default {
       this.intervalIds.forEach(i => simulator.stopIntervalPost(i))
     },
     clickedResetButton() {
+      this.settings = termsGen.getTermSettings()
       this.showResetModal = true
     },
     async resetCounts() {
+      this.settings = termsGen.getTermSettings()
+      await api.applySettings(this.settings)
       // const tasks = await simulator.getTable()
       // const usingTasks = this.usingTaskIds.map(taskId => {
       //   const task = tasks.find(t => t.id === taskId)
