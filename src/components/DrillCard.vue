@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      {{machineName + '号機'}}
+      {{ machineName }}
     </v-card-title>
     <v-card-text>
       <v-container>
