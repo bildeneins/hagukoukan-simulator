@@ -1,4 +1,4 @@
-const counts = require('sim-counts')
+const counts = require('../../sim-counts')
 // function getCountForNormalTask() {
 //   return 0
 // }

@@ -45,7 +45,8 @@ import DrillCard from "./components/DrillCard";
 import DrillBtn from "./components/DrillBtn";
 import ResetModal from "./components/ResetModal";
 import api from './api'
-import countsGenerator from "./scripts/countsGenerator";
+// import countsGenerator from "./scripts/countsGenerator";
+const counts = require('../sim-counts')
 
 export default {
   name: 'App',
@@ -55,7 +56,7 @@ export default {
   data: () => ({
     running: false,
     tasks: [],
-    usingTaskIds: [6, 7, 8, 9, 10, 11, 12, 13, 14],
+    usingTaskIds: [7, 8, 9, 10, 11, 12, 13, 14, 15],
     idLineNumbers: [],
     machines: [
       { id: 0, name: '1号機', stopping: false, emergency: false},
@@ -121,15 +122,15 @@ export default {
       this.showResetModal = true
     },
     async resetCounts() {
-      const tasks = await simulator.getTable()
-      const usingTasks = this.usingTaskIds.map(taskId => {
-        const task = tasks.find(t => t.id === taskId)
-        if (task) {
-          return task
-        }
-      })
-      const taskCounts = await countsGenerator.getCounts(usingTasks)
-      await api.setCounts(taskCounts)
+      // const tasks = await simulator.getTable()
+      // const usingTasks = this.usingTaskIds.map(taskId => {
+      //   const task = tasks.find(t => t.id === taskId)
+      //   if (task) {
+      //     return task
+      //   }
+      // })
+      // const taskCounts = await countsGenerator.getCounts(usingTasks)
+      await api.setCounts(counts)
       this.showResetModal = false
     },
     clickedDrillCardStopBtn(machineId) {
